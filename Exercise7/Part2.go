@@ -1,27 +1,32 @@
 package main
 import (
 	"fmt"
-//	"sync"	
+	"time"
 )
 
-var ch channel
+var ch = make(chan int)
 var srvInt int = 0
 
-func server(newint channel int){
-	srvInt <- newint
-	fmt.Printf("Int has changed, it is now: %d", srvInt)
+func server(){
+	for ;true; {
+		temp := <- ch //wait for int to add to srvInt
+		srvInt+=temp 
+		fmt.Printf("Int has changed, it is now: %d\n", srvInt)
+	}
 }
 
-func client(ch channel int){
-	while(true){
-		var temp int <- ch
-		ch <- temp+3
-	    sleep(1)
+func client(){
+	for ;true; {
+		ch <- 3 //Put the int to add in channel
+	    time.Sleep(1000000000)
 	}
 }
 
 func main(){
-	go server(channel)
-	go client(channel)
-	go client(channel)	
+	go server()
+	for i := 0;i<4;i++{
+		go client()
+	}
+	never := make (chan int)		
+	<-never
 }
